@@ -1,7 +1,6 @@
 import pygame
 from utils import *
 from Pet import PetSprite, ShadowSprite
-from Background import Background
 import Food
 
 from Effects import *
@@ -12,35 +11,37 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Hello Clean")
 
 clock = pygame.time.Clock()
-FPS = 60
+FPS = 24
 
 
-all_sprites = pygame.sprite.Group()
-
-background = Background()
+all_sprites = pygame.sprite.LayeredDirty()
 
 pet = PetSprite(pygame.Vector2(0, 0))
 
 shadow = ShadowSprite(pet)
 
-all_sprites.add(background)
-all_sprites.add(shadow)
 all_sprites.add(pet)
-all_sprites.remove()
+all_sprites.add(shadow)
 
 HEART_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(HEART_EVENT, 500)
 
+background_image = pygame.image.load(
+    "assets/background/background.png").convert()
+background_surface = pygame.transform.scale(
+    background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 
 run = True
 while run:
+    all_sprites.clear(screen, background_surface)
+
     clock.tick(FPS)
-#    print(clock.get_fps())
-    screen.fill("cyan")
+    print(clock.get_fps())
 
     all_sprites.update()
 
-    all_sprites.draw(screen)
+    rects = all_sprites.draw(screen)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -64,8 +65,8 @@ while run:
             x, y = screen_to_word(screen_x, screen_y)
             all_sprites.add(Food.RandomFood(x, y))
 
-            print(screen_x,screen_y)
+            print(screen_x, screen_y)
 
-    pygame.display.flip()
+    pygame.display.update(rects)
 
 pygame.quit()

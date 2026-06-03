@@ -24,7 +24,7 @@ class PetAnimation:
         self.current_index = (self.current_index + 1) % self.len
 
 
-class PetSprite(pygame.sprite.Sprite):
+class PetSprite(pygame.sprite.DirtySprite):
     def __init__(self, pos: pygame.Vector2):
         pygame.sprite.Sprite.__init__(self)
 
@@ -34,12 +34,20 @@ class PetSprite(pygame.sprite.Sprite):
         self.size = 100
 
         self.animation = PetAnimation('assets/walk', 120, pet=self)
+        self.dirty = 1
+
+        self.visible = 1
+        self.blendmode = 0
+
+        self.source_rect = None
 
     def update(self):
         self.pos += self.vel
 
         if self.pos.x < -SCREEN_WIDTH//2 or self.pos.x > SCREEN_WIDTH//2:
             self.vel.x *= -1
+
+        self.dirty = 1
 
         self.animation.update()
 
@@ -54,7 +62,7 @@ class PetSprite(pygame.sprite.Sprite):
         return pygame.transform.scale(self.animation.image, (self.size, self.size))
 
 
-class ShadowSprite(pygame.sprite.Sprite):
+class ShadowSprite(pygame.sprite.DirtySprite):
     def __init__(self, pet):
         super().__init__()
         self.pet = pet
@@ -62,7 +70,13 @@ class ShadowSprite(pygame.sprite.Sprite):
         self.image = pygame.Surface((80, 25), pygame.SRCALPHA)
         pygame.draw.ellipse(self.image, (0, 0, 0, 80), self.image.get_rect())
         self.rect = self.image.get_rect()
+        self.dirty = 1
+
+        self.visible = 1
+        self.blendmode = 0
 
     def update(self):
         self.rect.centerx = self.pet.rect.centerx
         self.rect.centery = self.pet.rect.bottom - 20
+
+        self.dirty = 1
