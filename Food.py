@@ -3,7 +3,7 @@ from utils import *
 import random
 
 
-class Item(pygame.sprite.DirtySprite):
+class Item(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
 
@@ -13,18 +13,12 @@ class Item(pygame.sprite.DirtySprite):
 
         self.acc = pygame.Vector2(0, -1)
 
-        self.dirty = 1
-        self.visible = 1
-        self.blendmode = 0
-
     def update(self):
         self.vel += self.acc
         self.pos += self.vel
         if self.pos.y <= 10:
             self.vel.y = 0
             self.acc.y = 0
-        else:
-            self.dirty = 1
 
 
 class Food(Item):

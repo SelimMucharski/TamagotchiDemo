@@ -22,19 +22,9 @@ class Effect(pygame.sprite.DirtySprite):
 
         self.animation_frame = 0
 
-        self.dirty = 1
-        self.visible = 1
-        self.blendmode = 0
-
     def update(self):
         self.pos += self.vel
-
-        prev_frame = self.animation_frame
-
         self.animation_frame = (self.animation_frame + 1) % len(self.images)
-
-        if prev_frame == self.animation_frame:
-            self.dirty = 1
 
         # usuń po czasie
         if pygame.time.get_ticks() - self.spawn_time > self.lifetime:

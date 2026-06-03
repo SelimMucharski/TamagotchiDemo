@@ -6,8 +6,6 @@ import os
 
 class PetAnimation:
     def __init__(self, animation_path: str, length: int, pet, file_format='png'):
-
-    def __init__(self, animation_path: str, length: int, pet, file_format='png'):
         self.current_index = 0
 
         self.images = [pygame.image.load(os.path.join(
@@ -37,10 +35,6 @@ class PetSprite(pygame.sprite.DirtySprite):
         self.size = 100
 
         self.animation = PetAnimation('assets/walk', 120, pet=self)
-        self.dirty = 1
-
-        self.visible = 1
-        self.blendmode = 0
 
         self.source_rect = None
 
@@ -49,8 +43,6 @@ class PetSprite(pygame.sprite.DirtySprite):
 
         if self.pos.x < -SCREEN_WIDTH//2 or self.pos.x > SCREEN_WIDTH//2:
             self.vel.x *= -1
-
-        self.dirty = 1
 
         self.animation.update()
 
@@ -73,13 +65,7 @@ class ShadowSprite(pygame.sprite.DirtySprite):
         self.image = pygame.Surface((80, 25), pygame.SRCALPHA)
         pygame.draw.ellipse(self.image, (0, 0, 0, 80), self.image.get_rect())
         self.rect = self.image.get_rect()
-        self.dirty = 1
-
-        self.visible = 1
-        self.blendmode = 0
 
     def update(self):
         self.rect.centerx = self.pet.rect.centerx
         self.rect.centery = self.pet.rect.bottom - 20
-
-        self.dirty = 1
