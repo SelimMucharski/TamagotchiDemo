@@ -29,7 +29,7 @@ class PetSprite(pygame.sprite.Sprite):
 
         self.size = 100
 
-        self.animation = PetAnimation('assets/sleep', 150)
+        self.animation = PetAnimation('assets/eat', 150)
 
     def update(self):
         self.pos += self.vel

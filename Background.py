@@ -7,10 +7,9 @@ class Background(pygame.sprite.Sprite):
         super().__init__()
 
         layers = [
-            pygame.image.load("assets/1.png").convert_alpha(),
-            pygame.image.load("assets/3.png").convert_alpha(),
-            pygame.image.load("assets/4.png").convert_alpha(),
-            pygame.image.load("assets/5.png").convert_alpha()
+            pygame.image.load("assets/background/1.png").convert_alpha(),
+            pygame.image.load("assets/background/3.png").convert_alpha(),
+            pygame.image.load("assets/background/4.png").convert_alpha()
         ]
 
         width = layers[0].get_width()
