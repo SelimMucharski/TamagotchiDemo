@@ -11,7 +11,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Hello Clean")
 
 clock = pygame.time.Clock()
-FPS = 24
+FPS = 8
 
 
 all_sprites = pygame.sprite.LayeredDirty()
@@ -65,6 +65,7 @@ while run:
             x, y = screen_to_word(screen_x, screen_y)
             all_sprites.add(Food.RandomFood(x, y))
 
+            print(screen_x, screen_y)
             print(screen_x, screen_y)
 
     pygame.display.update(rects)

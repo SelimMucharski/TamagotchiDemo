@@ -6,17 +6,12 @@ import os
 
 class PetAnimation:
     def __init__(self, animation_path: str, length: int, pet, file_format='png'):
+
+    def __init__(self, animation_path: str, length: int, pet, file_format='png'):
         self.current_index = 0
-<<<<<<< HEAD
-        self.images = [pygame.image.load(os.path.join(
-            animation_path, f'tile{i:03d}.{file_format}')).convert_alpha() for i in range(0, length, 5)]
-
-        self.len = len(self.images)
-=======
 
         self.images = [pygame.image.load(os.path.join(
             animation_path, f'tile{i:03d}.{file_format}')).convert_alpha() for i in range(0, length, 5)]
->>>>>>> 5f49a13 (Reduced number of frames in pet animation)
 
         self.pet = pet
 
@@ -28,6 +23,7 @@ class PetAnimation:
         return image if self.pet.vel.x > 0 else pygame.transform.flip(image, 1, 0)
 
     def update(self):
+        self.current_index = (self.current_index + 1) % len(self.images)
         self.current_index = (self.current_index + 1) % len(self.images)
 
 
