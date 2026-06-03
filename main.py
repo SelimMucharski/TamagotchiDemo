@@ -1,8 +1,10 @@
 import pygame
 from utils import *
-from Pet import PetSprite, ShadowSprite, HeartEffect, FlyEffect
+from Pet import PetSprite, ShadowSprite
 from Background import Background
 import random
+
+from Effects import *
 
 pygame.init()
 
