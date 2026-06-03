@@ -61,6 +61,6 @@ def addHeartToPet(sprites, pet):
     sprites.add(
         HeartEffect(
             pet.pos.x + random.uniform(-10, 10),
-            pet.pos.y + pet.size + random.uniform(-10, 10) - 10
+            pet.pos.y + random.uniform(-10, 10) + 90
         )
     )
