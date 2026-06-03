@@ -2,7 +2,7 @@ import pygame
 from utils import *
 from Pet import PetSprite, ShadowSprite
 from Background import Background
-import random
+import Food
 
 from Effects import *
 
@@ -48,6 +48,22 @@ while run:
 
         if event.type == HEART_EVENT:
             addHeartToPet(all_sprites, pet)
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            screen_x, screen_y = pygame.mouse.get_pos()
+            x, y = screen_to_word(screen_x, screen_y)
+            all_sprites.add(Food.RandomFood(x, y))
+
+        if event.type == pygame.FINGERDOWN:
+            if event.x == 0 and event.y == 0:
+                continue
+
+            x = event.y * screen.get_height()
+            y = (1 - event.x) * screen.get_width()
+            screen_x, screen_y = pygame.mouse.get_pos()
+
+            x, y = screen_to_word(screen_x, screen_y)
+            all_sprites.add(Food.RandomFood(x, y))
 
     pygame.display.flip()
 
