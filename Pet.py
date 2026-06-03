@@ -5,17 +5,20 @@ import os
 
 
 class PetAnimation:
-    def __init__(self, animation_path: str, len: int, file_format='png'):
+    def __init__(self, animation_path: str, len: int, pet, file_format='png'):
         self.current_index = 0
         self.len = len
         self.images = [pygame.image.load(os.path.join(
             animation_path, f'tile{i:03d}.{file_format}')).convert_alpha() for i in range(len)]
 
+        self.pet = pet
+
         pass
 
     @property
     def image(self):
-        return self.images[self.current_index]
+        image = self.images[self.current_index]
+        return image if self.pet.vel.x > 0 else pygame.transform.flip(image, 1, 0)
 
     def update(self):
         self.current_index = (self.current_index + 1) % self.len
@@ -26,14 +29,17 @@ class PetSprite(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.pos = pos
-        self.vel = pygame.Vector2(0, 0)
+        self.vel = pygame.Vector2(3, 0)
 
         self.size = 100
 
-        self.animation = PetAnimation('assets/eat', 150)
+        self.animation = PetAnimation('assets/walk', 120, pet=self)
 
     def update(self):
         self.pos += self.vel
+
+        if self.pos.x < -SCREEN_WIDTH//2 or self.pos.x > SCREEN_WIDTH//2:
+            self.vel.x *= -1
 
         self.animation.update()
 

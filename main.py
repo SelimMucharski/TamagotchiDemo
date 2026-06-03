@@ -15,15 +15,6 @@ clock = pygame.time.Clock()
 FPS = 24
 
 
-def addHeartToPet(sprites, pet):
-    sprites.add(
-        FlyEffect(
-            pet.pos.x + random.uniform(-10, 10),
-            pet.pos.y + pet.size + random.uniform(-10, 10) - 10
-        )
-    )
-
-
 all_sprites = pygame.sprite.Group()
 
 background = Background()
@@ -38,7 +29,6 @@ all_sprites.add(pet)
 all_sprites.remove()
 
 HEART_EVENT = pygame.USEREVENT + 1
-
 pygame.time.set_timer(HEART_EVENT, 500)
 
 

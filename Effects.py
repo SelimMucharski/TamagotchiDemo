@@ -56,3 +56,12 @@ class FlyEffect(Effect):
 
         self.images = [pygame.image.load(
             f"assets/fly/tile00{i}.png").convert_alpha() for i in range(3)]
+
+
+def addHeartToPet(sprites, pet):
+    sprites.add(
+        HeartEffect(
+            pet.pos.x + random.uniform(-10, 10),
+            pet.pos.y + pet.size + random.uniform(-10, 10) - 10
+        )
+    )
