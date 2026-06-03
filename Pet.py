@@ -5,11 +5,12 @@ import os
 
 
 class PetAnimation:
-    def __init__(self, animation_path: str, len: int, pet, file_format='png'):
+    def __init__(self, animation_path: str, length: int, pet, file_format='png'):
         self.current_index = 0
-        self.len = len
         self.images = [pygame.image.load(os.path.join(
-            animation_path, f'tile{i:03d}.{file_format}')).convert_alpha() for i in range(len)]
+            animation_path, f'tile{i:03d}.{file_format}')).convert_alpha() for i in range(0, length, 5)]
+
+        self.len = len(self.images)
 
         self.pet = pet
 
@@ -21,7 +22,7 @@ class PetAnimation:
         return image if self.pet.vel.x > 0 else pygame.transform.flip(image, 1, 0)
 
     def update(self):
-        self.current_index = (self.current_index + 1) % self.len
+        self.current_index = (self.current_index + 1) % len(self.images)
 
 
 class PetSprite(pygame.sprite.DirtySprite):
