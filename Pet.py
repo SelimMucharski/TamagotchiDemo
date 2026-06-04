@@ -175,5 +175,6 @@ class ShadowSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self):
-        self.rect.centerx = self.pet.pos.x
-        self.rect.centery = self.pet.pos.y - 20
+        x, y = world_to_screen(*self.pet.pos)
+        self.rect.centerx = x
+        self.rect.centery = y - 20

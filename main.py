@@ -8,9 +8,9 @@ from Settings import SettingsMenu
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-manager = pygame_gui.UIManager((SCREEN_WIDTH, SCREEN_HEIGHT))
+manager = manager = pygame_gui.UIManager(
+    (SCREEN_WIDTH, SCREEN_HEIGHT), "theme.json")
 
-pygame.display.set_caption("Hello Clean")
 clock = pygame.time.Clock()
 
 all_sprites = pygame.sprite.Group()

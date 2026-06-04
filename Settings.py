@@ -9,6 +9,14 @@ class SettingsMenu:
         self.manager = manager
         self.expanded = False
 
+        self.FOOD_TO_GIVE = 5
+
+        self.info_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect((0, 0), (190, 50)),
+            text=f"Jedzenie: {self.FOOD_TO_GIVE}",
+            manager=manager
+        )
+
         self.img_closed = pygame.transform.smoothscale(
             pygame.image.load("assets/gui/plus.png").convert_alpha(), (50, 50))
         self.img_opened = pygame.transform.smoothscale(
@@ -37,13 +45,14 @@ class SettingsMenu:
                 image_surface=img,
                 manager=manager
             )
-            btn.hide()  # Ukrywamy na start
+            btn.hide()
             self.buttons.append(btn)
 
     def close(self):
         self.expanded = False
         self.toggle_btn.set_image(self.img_closed)
 
+        self.info_label.visible = True
         for btn in self.buttons:
             btn.hide()
 
@@ -51,11 +60,16 @@ class SettingsMenu:
         self.expanded = True
         self.toggle_btn.set_image(self.img_opened)
 
+        self.info_label.visible = False
         for btn in self.buttons:
             btn.show()
 
     def toggle(self):
         self.close() if self.expanded else self.open()
+
+    def update_info(self, new_amount):
+        self.FOOD_TO_GIVE = new_amount
+        self.info_label.set_text(f"Jedzenie: {self.FOOD_TO_GIVE}")
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
