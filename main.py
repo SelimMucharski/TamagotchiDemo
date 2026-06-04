@@ -112,7 +112,8 @@ while run:
             pygame.event.post(
                 pygame.Event(
                     pygame.MOUSEBUTTONDOWN,
-                    pos=(screen_x, screen_y)
+                    pos=(screen_x, screen_y),
+                    button=0
                 )
             )
 
