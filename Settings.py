@@ -24,12 +24,6 @@ class SettingsMenu:
             manager=manager
         )
 
-        self.health_info = pygame_gui.elements.UILabel(
-            text=f"{utils.PET_NAME}",
-            relative_rect=pygame.Rect((10, 30), (200, 70)),
-            manager=manager
-        )
-
         self.info.append(self.food_info_label)
         self.info.append(self.pet_name_info_label)
 

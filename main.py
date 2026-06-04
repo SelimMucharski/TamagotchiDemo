@@ -32,6 +32,9 @@ run = True
 db = DatabaseManager(SUPABASE_URL, SUPABASE_KEY)
 threading.Thread(target=run_db_loop, args=(db,), daemon=True).start()
 
+health_levels = [pygame.transform.scale(pygame.image.load(
+    f"assets/health/tile{i:03d}.png").convert_alpha(), (40, 40)) for i in range(6)]
+
 while run:
     time_delta = clock.tick(8) / 1000.0
 
@@ -98,6 +101,20 @@ while run:
         pet.eat(f)
 
     screen.blit(background, (0, 0))
+
+    for i in range(utils.MAX_HEALTH):
+        if utils.HEALTH_LEVEL >= i + 1:
+            level = 5
+        elif int(utils.HEALTH_LEVEL) + 1 < i + 1:
+            level = 0
+        else:
+            rest = utils.HEALTH_LEVEL - int(utils.HEALTH_LEVEL)
+
+            level = int(rest * 6)
+
+        screen.blit(health_levels[level],
+                    (SCREEN_WIDTH-(utils.MAX_HEALTH - i)*40 - 10, 70))
+
     all_sprites.draw(screen)
     manager.draw_ui(screen)
     pygame.display.flip()
