@@ -95,6 +95,10 @@ while run:
 
             if not manager.get_focus_set():
                 world_x, world_y = screen_to_word(*pos)
+
+                print(pos)
+                print((world_x, world_y))
+
                 food = Food.RandomFood(world_x, world_y)
                 all_sprites.add(food)
                 foods.add(food)
