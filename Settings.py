@@ -10,11 +10,28 @@ class SettingsMenu:
         self.manager = manager
         self.expanded = False
 
-        self.info_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect((0, 0), (190, 50)),
+        self.info = []
+
+        self.food_info_label = pygame_gui.elements.UILabel(
             text=f"Jedzenie: {utils.FOOD_TO_GIVE}",
+            relative_rect=pygame.Rect((10, 10), (200, 70)),
             manager=manager
         )
+
+        self.pet_name_info_label = pygame_gui.elements.UILabel(
+            text=f"{utils.PET_NAME}",
+            relative_rect=pygame.Rect((10, 30), (200, 70)),
+            manager=manager
+        )
+
+        self.health_info = pygame_gui.elements.UILabel(
+            text=f"{utils.PET_NAME}",
+            relative_rect=pygame.Rect((10, 30), (200, 70)),
+            manager=manager
+        )
+
+        self.info.append(self.food_info_label)
+        self.info.append(self.pet_name_info_label)
 
         self.img_closed = pygame.transform.smoothscale(
             pygame.image.load("assets/gui/plus.png").convert_alpha(), (50, 50))
@@ -49,7 +66,8 @@ class SettingsMenu:
         self.expanded = False
         self.toggle_btn.set_image(self.img_closed)
 
-        self.info_label.visible = True
+        for i in self.info:
+            i.visible = True
         for btn in self.buttons:
             btn.hide()
 
@@ -57,7 +75,9 @@ class SettingsMenu:
         self.expanded = True
         self.toggle_btn.set_image(self.img_opened)
 
-        self.info_label.visible = False
+        for i in self.info:
+            i.visible = False
+
         for btn in self.buttons:
             btn.show()
 
@@ -65,7 +85,12 @@ class SettingsMenu:
         self.close() if self.expanded else self.open()
 
     def update_info(self):
-        self.info_label.set_text(f"Jedzenie: {utils.FOOD_TO_GIVE}")
+        self.food_info_label.set_text(f"Jedzenie: {utils.FOOD_TO_GIVE}")
+
+        if utils.FOOD_TO_GIVE <= 0:
+            self.toggle_btn.hide()
+        else:
+            self.toggle_btn.show()
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:

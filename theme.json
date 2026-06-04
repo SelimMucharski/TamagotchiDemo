@@ -1,12 +1,13 @@
 {
     "label": {
         "font": {
-            "colours": {
-                "normal_text": "#FFFFFF"
-            },
             "name": "some name",
-            "size": 24,
+            "size": "15",
             "regular_path": "assets/fonts/SuperLegendBoy-4w8Y.ttf"
+        },
+        "misc": {
+            "text_horiz_alignment": "left",
+            "text_vert_alignment": "top"
         }
     }
 }

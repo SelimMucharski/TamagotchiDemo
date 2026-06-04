@@ -17,8 +17,11 @@ HEART_EVENT = 32867
 ITEM_ON_GROUND_EVENT = 32868
 
 FOOD_TO_GIVE = 5
-
 ITEM_CHOSEN = None
+PET_NAME = "Franek"
+
+HEALTH_LEVEL = 3.25
+MAX_HEALTH = 5
 
 
 def world_to_screen(x, y):
