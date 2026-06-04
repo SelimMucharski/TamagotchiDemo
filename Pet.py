@@ -131,7 +131,7 @@ class PetAnimation:
         self.current_index = (self.current_index + 1) % len(self.images)
 
 
-class PetSprite(pygame.sprite.DirtySprite):
+class PetSprite(pygame.sprite.Sprite):
     def __init__(self, pet: Pet):
         pygame.sprite.Sprite.__init__(self)
 
@@ -162,7 +162,7 @@ class PetSprite(pygame.sprite.DirtySprite):
         return self.animations[self.pet.animation_name].image
 
 
-class ShadowSprite(pygame.sprite.DirtySprite):
+class ShadowSprite(pygame.sprite.Sprite):
     def __init__(self, pet):
         super().__init__()
         self.pet = pet
