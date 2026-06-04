@@ -2,6 +2,7 @@ import pygame
 import pygame_gui
 
 from utils import *
+import utils
 
 
 class SettingsMenu:
@@ -9,11 +10,9 @@ class SettingsMenu:
         self.manager = manager
         self.expanded = False
 
-        self.FOOD_TO_GIVE = 5
-
         self.info_label = pygame_gui.elements.UILabel(
             relative_rect=pygame.Rect((0, 0), (190, 50)),
-            text=f"Jedzenie: {self.FOOD_TO_GIVE}",
+            text=f"Jedzenie: {utils.FOOD_TO_GIVE}",
             manager=manager
         )
 
@@ -27,8 +26,6 @@ class SettingsMenu:
             image_surface=self.img_closed,
             manager=manager
         )
-
-        self.ITEM_CHOSEN = None
 
         self.ICONS_TO_SELECT = 5
 
@@ -67,13 +64,15 @@ class SettingsMenu:
     def toggle(self):
         self.close() if self.expanded else self.open()
 
-    def update_info(self, new_amount):
-        self.FOOD_TO_GIVE = new_amount
-        self.info_label.set_text(f"Jedzenie: {self.FOOD_TO_GIVE}")
+    def update_info(self):
+        self.info_label.set_text(f"Jedzenie: {utils.FOOD_TO_GIVE}")
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
+
+            if utils.FOOD_TO_GIVE <= 0:
+                return True
 
             if self.toggle_btn.rect.collidepoint(pos):
                 self.toggle()
@@ -83,7 +82,7 @@ class SettingsMenu:
                 for i, btn in enumerate(self.buttons):
                     if btn.rect.collidepoint(pos):
                         print(f"Food id: {i}")
-                        self.ITEM_CHOSEN = i
+                        utils.ITEM_CHOSEN = i
                         self.close()
                         return True
         return False

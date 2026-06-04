@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 from utils import *
+import utils
 from Pet import PetSprite, ShadowSprite, Pet
 import Food
 from Effects import *
@@ -37,6 +38,8 @@ while run:
     try:
         task = db.event_queue.get_nowait()
         print(f"Zadanie z bazy! {task}")
+        utils.FOOD_TO_GIVE += 1
+        menu.update_info()
     except asyncio.QueueEmpty:
         pass
 
@@ -54,13 +57,16 @@ while run:
             if not manager.get_focus_set():
                 world_x, world_y = screen_to_word(*pos)
 
-                if menu.ITEM_CHOSEN is not None:
+                if utils.ITEM_CHOSEN is not None:
                     food = Food.Food(world_x, world_y,
-                                     f'assets/food/tile{menu.ITEM_CHOSEN:03d}.png')
+                                     f'assets/food/tile{utils.ITEM_CHOSEN:03d}.png')
                     all_sprites.add(food)
                     foods.add(food)
 
-                    menu.ITEM_CHOSEN = None
+                    utils.ITEM_CHOSEN = None
+                    utils.FOOD_TO_GIVE -= 1
+
+                    menu.update_info()
 
         if event.type == pygame.FINGERDOWN:
             if event.x == 0 and event.y == 0:

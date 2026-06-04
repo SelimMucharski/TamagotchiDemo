@@ -16,6 +16,10 @@ WORLD_0Y = SCREEN_HEIGHT - 10
 HEART_EVENT = 32867
 ITEM_ON_GROUND_EVENT = 32868
 
+FOOD_TO_GIVE = 5
+
+ITEM_CHOSEN = None
+
 
 def world_to_screen(x, y):
     px = x + WORLD_0X

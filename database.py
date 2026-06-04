@@ -1,5 +1,4 @@
 import asyncio
-import threading
 from supabase import create_async_client
 
 FAMILY_ID = "acc4e8ca-ab29-4342-83e0-fd82736455ce"
