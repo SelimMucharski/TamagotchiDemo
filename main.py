@@ -35,7 +35,6 @@ background_surface = pygame.transform.scale(
 run = True
 while run:
     clock.tick(FPS)
-    print(pet.waypoints)
 
     all_sprites.update()
 
@@ -75,11 +74,13 @@ while run:
             screen_y = event.x * screen.get_height()
 
             x, y = screen_to_word(screen_x, screen_y)
-            all_sprites.add(Food.RandomFood(x, y))
+
+            food_entity = Food.RandomFood(x, y)
+            all_sprites.add(food_entity)
             foods.add(food_entity)
 
-            print(screen_x, screen_y)
-            print(screen_x, screen_y)
+            #print(screen_x, screen_y)
+            #print(screen_x, screen_y)
 
     pygame.display.flip()
 
