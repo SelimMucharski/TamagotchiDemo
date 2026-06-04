@@ -89,9 +89,8 @@ while run:
 
         menu_handled = menu.handle_event(event)
 
-        if not menu_handled and (event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.FINGERDOWN):
-            pos = event.pos if event.type == pygame.MOUSEBUTTONDOWN else (
-                event.x * SCREEN_WIDTH, event.y * SCREEN_HEIGHT)
+        if not menu_handled and event.type == pygame.MOUSEBUTTONDOWN:
+            pos = event.pos
 
             if not manager.get_focus_set():
                 world_x, world_y = screen_to_word(*pos)
@@ -102,6 +101,20 @@ while run:
                 food = Food.RandomFood(world_x, world_y)
                 all_sprites.add(food)
                 foods.add(food)
+
+        if event.type == pygame.FINGERDOWN:
+            if event.x == 0 and event.y == 0:
+                continue
+
+            screen_x = (1-event.y) * screen.get_width()
+            screen_y = event.x * screen.get_height()
+
+            pygame.event.post(
+                pygame.Event(
+                    pygame.MOUSEBUTTONDOWN,
+                    pos=(screen_x, screen_y)
+                )
+            )
 
         if event.type == HEART_EVENT:
             addHeartToPet(all_sprites, pet)
