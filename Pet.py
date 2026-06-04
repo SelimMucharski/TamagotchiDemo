@@ -2,6 +2,7 @@ import random
 import pygame
 from utils import *
 import os
+from Food import Food
 
 
 class PetState:
@@ -12,6 +13,29 @@ class PetState:
         pass
 
     def exit(self, pet):
+        pass
+
+
+class HappyState(PetState):
+    def enter(self, pet):
+        self.pet = pet
+
+        self.pet.animation_name = "eat"
+        self.pet.vel.x = 0
+
+        self.timer = 0
+
+    def update(self, pet, world):
+        if self.timer % 2 == 0:
+            event = pygame.event.Event(
+                HEART_EVENT
+            )
+
+            pygame.event.post(event)
+
+        if self.timer > 10:
+            self.pet.change_state(WanderState())
+        self.timer += 1
         pass
 
 
@@ -26,13 +50,29 @@ class WanderState(PetState):
         if pet.pos.x > SCREEN_WIDTH//2 or pet.pos.x < -SCREEN_WIDTH//2:
             pet.vel.x *= -1
 
-        if self.timer % 60 == 0:
-            pet.vel.x = 0
-            pet.animation_name = "idle"
-
-        if self.timer % 60 == 30:
-            pet.vel.x = random.uniform(-5, 5)
+        if pet.waypoints:
             pet.animation_name = "walk"
+
+            waypoint = pet.waypoints[0]
+
+            if abs(pet.pos.x - waypoint) < 20:
+                pet.waypoints.pop(0)
+
+            else:
+                pet.vel.x = 8
+                pet.vel.x *= -1 if pet.pos.x > waypoint else 1
+
+            pass
+
+        else:
+            if self.timer % 60 == 0:
+                pet.vel.x = random.uniform(2, 5)
+                pet.vel.x *= -1 if random.random() > 0.5 else 1
+                pet.animation_name = "walk"
+
+            if self.timer % 60 == 30:
+                pet.vel.x = 0
+                pet.animation_name = "idle"
 
         self.timer += 1
 
@@ -44,6 +84,20 @@ class Pet:
 
         self.state = WanderState()
         self.state.enter(self)
+
+        self.waypoints = []
+
+    def eat(self, food: Food):
+        waypoints_tmp = [
+            w for w in self.waypoints if food.pos.x != w]
+
+        self.waypoints = waypoints_tmp
+
+        self.state = HappyState()
+        self.state.enter(self)
+
+    def go_to(self, x_coordinate: float):
+        self.waypoints.append(x_coordinate)
 
     def update(self, world):
         self.state.update(self, world)
@@ -61,7 +115,7 @@ class PetAnimation:
         self.current_index = 0
 
         self.images = [pygame.image.load(os.path.join(
-            animation_path, f'tile{i:03d}.{file_format}')).convert_alpha() for i in range(0, length, 5)]
+            animation_path, f'tile{i:03d}.{file_format}')).convert_alpha() for i in range(0, length, 3)]
 
         self.pet = pet
 

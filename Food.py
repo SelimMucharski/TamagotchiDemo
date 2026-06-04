@@ -13,12 +13,25 @@ class Item(pygame.sprite.Sprite):
 
         self.acc = pygame.Vector2(0, -1)
 
+        self.has_alerted = False
+
     def update(self):
         self.vel += self.acc
         self.pos += self.vel
         if self.pos.y <= 10:
             self.vel.y = 0
             self.acc.y = 0
+
+            if not self.has_alerted:
+
+                event = pygame.event.Event(
+                    ITEM_ON_GROUND_EVENT,
+                    pos=self.pos
+                )
+
+                pygame.event.post(event)
+
+                self.has_alerted = True
 
 
 class Food(Item):

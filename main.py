@@ -25,11 +25,6 @@ shadow = ShadowSprite(pet)
 all_sprites.add(shadow)
 all_sprites.add(pet_sprite)
 
-HEART_EVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(HEART_EVENT, 500)
-
-COLLECT_EVENT = pygame.USEREVENT + 2
-
 background_image = pygame.image.load(
     "assets/background/background.png").convert()
 
@@ -40,7 +35,7 @@ background_surface = pygame.transform.scale(
 run = True
 while run:
     clock.tick(FPS)
-    print(clock.get_fps())
+    print(pet.waypoints)
 
     all_sprites.update()
 
@@ -48,6 +43,9 @@ while run:
     all_sprites.draw(screen)
 
     hits = pygame.sprite.spritecollide(pet_sprite, foods, True)
+
+    for food in hits:
+        pet.eat(food)
 
     pet.update(None)
 
@@ -57,6 +55,9 @@ while run:
 
         if event.type == HEART_EVENT:
             addHeartToPet(all_sprites, pet)
+
+        if event.type == ITEM_ON_GROUND_EVENT:
+            pet.go_to(event.pos.x)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             screen_x, screen_y = pygame.mouse.get_pos()
