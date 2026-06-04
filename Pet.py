@@ -47,7 +47,10 @@ class WanderState(PetState):
     def update(self, pet, world):
         pet.pos += pet.vel
 
-        if pet.pos.x > SCREEN_WIDTH//2 or pet.pos.x < -SCREEN_WIDTH//2:
+        if pet.pos.x > SCREEN_WIDTH//2 - 10 and pet.vel.x > 0:
+            pet.vel.x *= -1
+
+        if pet.pos.x < -SCREEN_WIDTH//2 + 10 and pet.vel.x < 0:
             pet.vel.x *= -1
 
         if pet.waypoints:
