@@ -43,7 +43,10 @@ class Food(Item):
     @property
     def rect(self):
         rect = self.image.get_rect()
-        rect.center = world_to_screen(self.pos.x, self.pos.y+rect.size[1]//2)
+        rect.center = world_to_screen(
+            self.pos.x,
+            self.pos.y + rect.height // 2
+        )
         return rect
 
 

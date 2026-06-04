@@ -76,6 +76,7 @@ while run:
 
             x, y = screen_to_word(screen_x, screen_y)
             all_sprites.add(Food.RandomFood(x, y))
+            foods.add(food_entity)
 
             print(screen_x, screen_y)
             print(screen_x, screen_y)
