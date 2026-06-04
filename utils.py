@@ -1,3 +1,11 @@
+import os
+import dotenv
+
+dotenv.load_dotenv()
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 320
 

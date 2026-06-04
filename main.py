@@ -6,6 +6,10 @@ import Food
 from Effects import *
 from Settings import SettingsMenu
 
+import threading
+from database import DatabaseManager, run_db_loop
+import asyncio
+
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 manager = manager = pygame_gui.UIManager(
@@ -23,8 +27,18 @@ background = pygame.transform.scale(pygame.image.load(
     "assets/background/background.png").convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 run = True
+
+db = DatabaseManager(SUPABASE_URL, SUPABASE_KEY)
+threading.Thread(target=run_db_loop, args=(db,), daemon=True).start()
+
 while run:
     time_delta = clock.tick(8) / 1000.0
+
+    try:
+        task = db.event_queue.get_nowait()
+        print(f"Zadanie z bazy! {task}")
+    except asyncio.QueueEmpty:
+        pass
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -72,7 +86,8 @@ while run:
     pet.update(None)
     all_sprites.update()
 
-    hits = pygame.sprite.spritecollide(all_sprites.sprites()[1], foods, True)
+    hits = pygame.sprite.spritecollide(
+        all_sprites.sprites()[1], foods, True)
     for f in hits:
         pet.eat(f)
 
