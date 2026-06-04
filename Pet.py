@@ -15,7 +15,7 @@ class PetState:
         pass
 
 
-class WanderState(PetState):
+class IdleState(PetState):
     def enter(self, pet):
         pet.animation_name = "walk"
         self.timer = 0
@@ -36,17 +36,55 @@ class WanderState(PetState):
 
         self.timer += 1
 
+        # food_to_collect = world.food_on_ground()
 
-class Pet:
-    def __init__(self, x, y):
+        # if food_to_collect:
+        #     pet.change_state(WalkState())
+
+
+class SleepState(PetState):
+    def enter(self, pet):
+        pet.animation_name = "sleep"
+        pet.vel = pygame.Vector2(0, 0)
+        self.timer = 0
+
+
+class WalkState(PetState):
+    def enter(self, pet):
+        pet.animation_name = "walk"
+        pet.vel = pygame.Vector2(10, 0)
+        self.timer = 0
+
+    def update(self, pet, world):
+        pet.pos += pet.vel
+
+        if pet.pos.x > SCREEN_WIDTH//2 or pet.pos.x < -SCREEN_WIDTH//2:
+            pet.vel.x *= -1
+
+        self.timer += 1
+
+
+class Pet(pygame.sprite.Sprite):
+    def __init__(self, x, y, world):
+        super().__init__()
+
         self.pos = pygame.Vector2(x, y)
         self.vel = pygame.Vector2(0, 0)
 
-        self.state = WanderState()
+        self.state = IdleState()
         self.state.enter(self)
 
-    def update(self, world):
-        self.state.update(self, world)
+        self.world = world
+
+        self.animations = {
+            "cry": PetAnimation('assets/cry', 120, self),
+            "eat": PetAnimation('assets/eat', 150, self),
+            "sleep": PetAnimation('assets/sleep', 150, self),
+            "walk": PetAnimation('assets/walk', 120, self),
+            "idle": PetAnimation('assets/idle', 1, self)
+        }
+
+        self.animation_name = 'idle'
 
     def change_state(self, new_state):
         self.state.exit(self)
@@ -54,6 +92,23 @@ class Pet:
         self.state = new_state
 
         self.state.enter(self)
+
+    def update(self):
+        self.animations[self.animation_name].update()
+        self.state.update(self, self.world)
+
+    @property
+    def rect(self):
+        rect = self.image.get_rect()
+        rect.center = world_to_screen(
+            self.pos.x,
+            self.pos.y+rect.size[1]//2
+        )
+        return rect
+
+    @property
+    def image(self):
+        return self.animations[self.animation_name].image
 
 
 class PetAnimation:
@@ -77,38 +132,7 @@ class PetAnimation:
         self.current_index = (self.current_index + 1) % len(self.images)
 
 
-class PetSprite(pygame.sprite.DirtySprite):
-    def __init__(self, pet: Pet):
-        pygame.sprite.Sprite.__init__(self)
-
-        self.pet = pet
-
-        self.animations = {
-            "cry": PetAnimation('assets/cry', 120, pet),
-            "eat": PetAnimation('assets/eat', 150, pet),
-            "sleep": PetAnimation('assets/sleep', 150, pet),
-            "walk": PetAnimation('assets/walk', 120, pet),
-            "idle": PetAnimation('assets/idle', 1, pet)
-        }
-
-    def update(self):
-        self.animations[self.pet.animation_name].update()
-
-    @property
-    def rect(self):
-        rect = self.image.get_rect()
-        rect.center = world_to_screen(
-            self.pet.pos.x,
-            self.pet.pos.y+rect.size[1]//2
-        )
-        return rect
-
-    @property
-    def image(self):
-        return self.animations[self.pet.animation_name].image
-
-
-class ShadowSprite(pygame.sprite.DirtySprite):
+class ShadowSprite(pygame.sprite.Sprite):
     def __init__(self, pet):
         super().__init__()
         self.pet = pet
