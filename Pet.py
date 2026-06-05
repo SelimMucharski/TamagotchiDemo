@@ -111,7 +111,7 @@ class Pet:
     def update(self, world):
         self.state.update(self, world)
 
-        utils.HEALTH_LEVEL -= 0.001
+        utils.HEALTH_LEVEL -= utils.HEALTH_DECREASE_RATE
 
     def change_state(self, new_state):
         self.state.exit(self)
