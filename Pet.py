@@ -4,6 +4,7 @@ from utils import *
 import os
 from Food import Food
 import utils
+import asyncio
 
 
 class PetState:
@@ -96,6 +97,11 @@ class Pet:
 
     def eat(self, food: Food):
         utils.HEALTH_LEVEL = min(utils.HEALTH_LEVEL + 1, utils.MAX_HEALTH)
+
+        asyncio.run_coroutine_threadsafe(
+            utils.db.update_pet_energy(),
+            utils.db.loop
+        )
 
         waypoints_tmp = [
             w for w in self.waypoints if food.pos.x != w]

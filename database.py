@@ -39,6 +39,18 @@ class DatabaseManager:
         await self.load_info()
         print("System zadań aktywny.")
 
+    async def update_pet_energy(self):
+        energy_percent = int(
+            utils.HEALTH_LEVEL / utils.MAX_HEALTH * 100
+        )
+
+        await (
+            self.table("pets")
+            .update({"energy": energy_percent})
+            .eq("family_id", FAMILY_ID)
+            .execute()
+        )
+
     def _on_task_done(self, payload):
         new_task = payload['data']['record']
 
@@ -51,6 +63,7 @@ class DatabaseManager:
 
 def run_db_loop(db_manager):
     loop = asyncio.new_event_loop()
+    db_manager.loop = loop
     asyncio.set_event_loop(loop)
     loop.run_until_complete(db_manager.start())
     loop.run_forever()
