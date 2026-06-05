@@ -112,6 +112,7 @@ class Pet:
         self.state.update(self, world)
 
         utils.HEALTH_LEVEL -= utils.HEALTH_DECREASE_RATE
+        utils.HEALTH_LEVEL = max(utils.HEALTH_LEVEL, 0)
 
     def change_state(self, new_state):
         self.state.exit(self)
