@@ -77,10 +77,21 @@ class WanderState(PetState):
 
             if self.timer % 60 == 30:
                 pet.vel.x = 0
-                pet.animation_name = "idle"
 
-                if utils.HEALTH_LEVEL < utils.MOOD_TRESHOLD:
+                energy = utils.calculate_energy(world)
+                mood = utils.calculateMood(energy)
+
+                if mood == "sleepy":
+                    pet.animation_name = "sleep"
+                elif mood == "sad":
                     pet.animation_name = "cry"
+                elif mood == "neutral":
+                    pet.animation_name = "idle"
+                elif mood == "happy":
+                    pet.animation_name = "eat"
+
+                # if utils.HEALTH_LEVEL < utils.MOOD_TRESHOLD:
+                #     pet.animation_name = "cry"
 
         self.timer += 1
 
@@ -110,9 +121,7 @@ class Pet:
         self.waypoints.append(x_coordinate)
 
     def update(self, world):
-        self.state.update(self, world)
-
-        utils.HEALTH_LEVEL = calculate_energy(self.db) / 100 * utils.MAX_HEALTH
+        self.state.update(self, self.db)
 
     def change_state(self, new_state):
         self.state.exit(self)

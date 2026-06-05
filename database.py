@@ -27,13 +27,6 @@ class DatabaseManager:
             callback=self._on_task_change
         )
 
-        self.channel.on_postgres_changes(
-            event="*",
-            schema="public",
-            table="pets",
-            callback=self._on_pet_change
-        )
-
         await self.channel.subscribe()
 
         await self.load_tasks_cache()

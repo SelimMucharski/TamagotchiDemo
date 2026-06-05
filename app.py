@@ -18,14 +18,8 @@ from Effects import addFlyToPet, addHeartToPet
 
 dotenv.load_dotenv()
 
-
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-
-FOOD_TO_GIVE = 5
-PET_NAME = ""
-
-db = None
 
 
 class App:
@@ -88,6 +82,8 @@ class App:
         self.background = pygame.transform.scale(pygame.image.load(
             "assets/background/background.png").convert(), (utils.SCREEN_WIDTH, utils.SCREEN_HEIGHT))
 
+        pygame.time.set_timer(utils.UPDATE_PET_EVENT, 1000)
+
         while True:
             try:
                 msg = self.db.event_queue.get_nowait()
@@ -103,11 +99,12 @@ class App:
         while run:
             time_delta = self.clock.tick(8) / 1000.0
 
-            # try:
-            #     task = self.db.event_queue.get_nowait()
-            #     print(f"Zadanie z bazy! {task}")
-            # except asyncio.QueueEmpty:
-            #     pass
+            try:
+                msg = self.db.event_queue.get_nowait()
+                if msg['type'] == 'task_done':
+                    print('New task done')
+            except asyncio.QueueEmpty:
+                pass
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -133,12 +130,6 @@ class App:
 
                             utils.ITEM_CHOSEN = None
 
-                            self.db.loop.call_soon_threadsafe(
-                                lambda: asyncio.create_task(
-                                    utils.decreaseTasks(self.db)
-                                )
-                            )
-
                 if event.type == pygame.FINGERDOWN:
                     if event.x == 0 and event.y == 0:
                         continue
@@ -159,6 +150,17 @@ class App:
                 if event.type == utils.ITEM_ON_GROUND_EVENT:
                     self.pet.go_to(event.pos.x)
 
+                if event.type == utils.UPDATE_PET_EVENT:
+
+                    energy = utils.calculate_energy(self.db)
+                    mood = utils.calculateMood(energy)
+
+                    self.db.loop.call_soon_threadsafe(
+                        lambda: asyncio.create_task(
+                            self.db.update_pet(energy, mood)
+                        )
+                    )
+
             self.menu.update_info()
 
             self.manager.update(time_delta)
@@ -170,25 +172,34 @@ class App:
             for f in hits:
                 self.pet.eat(f)
 
+                self.db.loop.call_soon_threadsafe(
+                    lambda: asyncio.create_task(
+                        utils.decreaseTasks(self.db)
+                    )
+                )
+
             self.screen.blit(self.background, (0, 0))
 
+            health_level = utils.calculate_energy(
+                self.db) / 100 * utils.MAX_HEALTH
+
             for i in range(utils.MAX_HEALTH):
-                if utils.HEALTH_LEVEL >= i + 1:
+                if health_level >= i + 1:
                     level = 5
-                elif int(utils.HEALTH_LEVEL) + 1 < i + 1:
+                elif int(health_level) + 1 < i + 1:
                     level = 0
                 else:
-                    rest = utils.HEALTH_LEVEL - int(utils.HEALTH_LEVEL)
+                    rest = health_level - int(health_level)
 
                     level = int(rest * 6)
 
                 self.screen.blit(self.health_levels[level],
                                  (utils.SCREEN_WIDTH-(utils.MAX_HEALTH - i)*40 - 10, 70))
 
-            if utils.HEALTH_LEVEL < utils.MOOD_TRESHOLD:
-                fly_effect_tmp_variable += 1
-                addFlyToPet(
-                    self.all_sprites, self.pet) if fly_effect_tmp_variable % 10 == 0 else None
+            # if utils.HEALTH_LEVEL < utils.MOOD_TRESHOLD:
+            #     fly_effect_tmp_variable += 1
+            #     addFlyToPet(
+            #         self.all_sprites, self.pet) if fly_effect_tmp_variable % 10 == 0 else None
 
             self.all_sprites.draw(self.screen)
             self.manager.draw_ui(self.screen)
