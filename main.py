@@ -27,7 +27,6 @@ menu = SettingsMenu(manager)
 background = pygame.transform.scale(pygame.image.load(
     "assets/background/background.png").convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-run = True
 
 db = DatabaseManager(SUPABASE_URL, SUPABASE_KEY)
 threading.Thread(target=run_db_loop, args=(db,), daemon=True).start()
@@ -35,6 +34,9 @@ threading.Thread(target=run_db_loop, args=(db,), daemon=True).start()
 health_levels = [pygame.transform.scale(pygame.image.load(
     f"assets/health/tile{i:03d}.png").convert_alpha(), (40, 40)) for i in range(6)]
 
+fly_effect_tmp_variable = 0
+
+run = True
 while run:
     time_delta = clock.tick(8) / 1000.0
 
@@ -114,6 +116,11 @@ while run:
 
         screen.blit(health_levels[level],
                     (SCREEN_WIDTH-(utils.MAX_HEALTH - i)*40 - 10, 70))
+
+    if utils.HEALTH_LEVEL < utils.MOOD_TRESHOLD:
+        fly_effect_tmp_variable += 1
+        addFlyToPet(
+            all_sprites, pet) if fly_effect_tmp_variable % 10 == 0 else None
 
     all_sprites.draw(screen)
     manager.draw_ui(screen)

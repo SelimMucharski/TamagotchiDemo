@@ -78,6 +78,9 @@ class WanderState(PetState):
                 pet.vel.x = 0
                 pet.animation_name = "idle"
 
+                if utils.HEALTH_LEVEL < utils.MOOD_TRESHOLD:
+                    pet.animation_name = "cry"
+
         self.timer += 1
 
 

@@ -64,3 +64,13 @@ def addHeartToPet(sprites, pet):
             pet.pos.y + random.uniform(-10, 10) + 90
         )
     )
+
+
+def addFlyToPet(sprites, pet):
+    sprites.add(
+        FlyEffect(
+            pet.pos.x + random.uniform(-10, 10),
+            pet.pos.y + random.uniform(-10, 10) + 90,
+            2000
+        )
+    )
