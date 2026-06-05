@@ -1,11 +1,3 @@
-import os
-import dotenv
-
-dotenv.load_dotenv()
-
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 320
 
@@ -18,18 +10,13 @@ FLY_EVENT = 32869
 ITEM_ON_GROUND_EVENT = 32868
 
 
-FOOD_TO_GIVE = 5
 ITEM_CHOSEN = None
-PET_NAME = ""
+
 
 MAX_HEALTH = 8
 HEALTH_LEVEL = MAX_HEALTH
 
-HEALTH_DECREASE_RATE = 0.001
-
 MOOD_TRESHOLD = 2
-
-db = None
 
 
 def world_to_screen(x, y):
@@ -42,3 +29,55 @@ def screen_to_word(px, py):
     x = px - WORLD_0X
     y = WORLD_0Y - py
     return (x, y)
+
+
+def calculateFoodToGive(db):
+    return len([item for item in db.get_tasks_cached() if item["status"] == "done"])
+
+
+def calculate_energy(db):
+    penalty = sum(
+        5 if task["status"] in ("todo", "done")
+        else 10 if task["status"] == "expired"
+        else 0
+        for task in db.get_tasks_cached()
+    )
+
+    return max(100 - penalty, 0)
+
+
+def getPetName(db):
+    return db.pet_cache['name'] if db.pet_cache else ""
+
+
+def calculateMood(energy: int):
+    if energy < 10:
+        return 'sleepy'
+    if energy < 50:
+        return 'sad'
+    if energy < 80:
+        return 'neutral'
+
+    return 'happy'
+
+
+async def decreaseTasks(db):
+    done_task = next(
+        (task for task in db.tasks_cache.values()
+         if task["status"] == "done"),
+        None
+    )
+
+    if done_task is None:
+        return False
+
+    task_id = done_task["id"]
+
+    await (
+        db.table("tasks")
+        .update({"status": "exhausted"})
+        .eq("id", task_id)
+        .execute()
+    )
+
+    return True

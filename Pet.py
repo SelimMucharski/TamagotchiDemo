@@ -86,7 +86,7 @@ class WanderState(PetState):
 
 
 class Pet:
-    def __init__(self, x, y):
+    def __init__(self, x, y, db):
         self.pos = pygame.Vector2(x, y)
         self.vel = pygame.Vector2(0, 0)
 
@@ -95,14 +95,9 @@ class Pet:
 
         self.waypoints = []
 
+        self.db = db
+
     def eat(self, food: Food):
-        utils.HEALTH_LEVEL = min(utils.HEALTH_LEVEL + 1, utils.MAX_HEALTH)
-
-        asyncio.run_coroutine_threadsafe(
-            utils.db.update_pet_energy(),
-            utils.db.loop
-        )
-
         waypoints_tmp = [
             w for w in self.waypoints if food.pos.x != w]
 
@@ -117,8 +112,7 @@ class Pet:
     def update(self, world):
         self.state.update(self, world)
 
-        utils.HEALTH_LEVEL -= utils.HEALTH_DECREASE_RATE
-        utils.HEALTH_LEVEL = max(utils.HEALTH_LEVEL, 0)
+        utils.HEALTH_LEVEL = calculate_energy(self.db) / 100 * utils.MAX_HEALTH
 
     def change_state(self, new_state):
         self.state.exit(self)

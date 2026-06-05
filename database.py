@@ -1,8 +1,7 @@
 import asyncio
 from supabase import create_async_client
-import utils
 
-FAMILY_ID = "acc4e8ca-ab29-4342-83e0-fd82736455ce"
+FAMILY_ID = "e7db7b7e-0c56-4c40-90cc-85b58171f25e"
 
 
 class DatabaseManager:
@@ -11,51 +10,123 @@ class DatabaseManager:
         self.key = key
         self.client = None
         self.channel = None
+
         self.event_queue = asyncio.Queue()
 
-    async def load_info(self):
-        pet = (
+        self.tasks_cache = {}
+        self.pet_cache = None
+
+    async def start(self):
+        self.client = await create_async_client(self.url, self.key)
+        self.channel = self.client.channel("family-realtime")
+
+        self.channel.on_postgres_changes(
+            event="*",
+            schema="public",
+            table="tasks",
+            callback=self._on_task_change
+        )
+
+        self.channel.on_postgres_changes(
+            event="*",
+            schema="public",
+            table="pets",
+            callback=self._on_pet_change
+        )
+
+        await self.channel.subscribe()
+
+        await self.load_tasks_cache()
+        await self.load_pet_cache()
+
+        self.event_queue.put_nowait({"type": "ready"})
+        print("Connected to Database")
+
+    async def load_pet_cache(self):
+        result = (
             await self.table("pets")
-            .select("name,energy")
+            .select("id, name, energy, mood, family_id")
             .eq("family_id", FAMILY_ID)
             .single()
             .execute()
         )
 
-        utils.PET_NAME = pet.data['name']
-        utils.HEALTH_LEVEL = int(pet.data['energy']) / 100 * utils.MAX_HEALTH
+        self.pet_cache = result.data
 
-    async def start(self):
-        self.client = await create_async_client(self.url, self.key)
-        self.channel = self.client.channel("tasks-realtime")
-
-        self.channel.on_postgres_changes(
-            event="UPDATE",
-            schema="public",
-            table="tasks",
-            callback=self._on_task_done
-        )
-        await self.channel.subscribe()
-        await self.load_info()
-        print("System zadań aktywny.")
-
-    async def update_pet_energy(self):
-        energy_percent = int(
-            utils.HEALTH_LEVEL / utils.MAX_HEALTH * 100
-        )
-
+    async def update_pet(self, energy: int, mood: str):
         await (
             self.table("pets")
-            .update({"energy": energy_percent})
+            .update({"mood": mood, "energy": energy})
             .eq("family_id", FAMILY_ID)
             .execute()
         )
 
-    def _on_task_done(self, payload):
-        new_task = payload['data']['record']
+    def _on_pet_change(self, payload):
+        pet = payload["data"].get("record") or payload["data"].get("new")
 
-        if new_task['family_id'] == FAMILY_ID and new_task['status'] == 'done':
-            self.event_queue.put_nowait(new_task)
+        if not pet or pet["family_id"] != FAMILY_ID:
+            return
+
+        self.pet_cache = pet
+
+        self.event_queue.put_nowait({
+            "type": "pet_update",
+            "data": pet
+        })
+
+    async def load_tasks_cache(self):
+        result = (
+            await self.table("tasks")
+            .select("id, status, family_id")
+            .eq("family_id", FAMILY_ID)
+            .in_("status", ["todo", "done", "expired"])
+            .execute()
+        )
+
+        self.tasks_cache = {
+            task["id"]: {
+                "id": task["id"],
+                "status": task["status"]
+            }
+            for task in result.data
+        }
+
+    def _on_task_change(self, payload):
+        event_type = payload.get("eventType")
+        data = payload.get("data", {})
+
+        task = data.get("record") or data.get("new") or data.get("old")
+
+        if not task or task.get("family_id") != FAMILY_ID:
+            return
+
+        task_id = task["id"]
+        status = task.get("status")
+
+        if event_type == "DELETE":
+            self.tasks_cache.pop(task_id, None)
+            return
+
+        if status not in ("todo", "done", "expired"):
+            self.tasks_cache.pop(task_id, None)
+            return
+
+        self.tasks_cache[task_id] = {
+            "id": task_id,
+            "status": status
+        }
+
+        if status == "done":
+            self.event_queue.put_nowait({
+                "type": "task_done",
+                "data": self.tasks_cache[task_id]
+            })
+
+    def get_tasks_cached(self):
+        return list(self.tasks_cache.values())
+
+    def get_pet_cached(self):
+        return self.pet_cache
 
     def table(self, table_name: str):
         return self.client.table(table_name)

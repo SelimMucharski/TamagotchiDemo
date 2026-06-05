@@ -4,22 +4,26 @@ import pygame_gui
 from utils import *
 import utils
 
+from database import DatabaseManager
+
 
 class SettingsMenu:
-    def __init__(self, manager):
+    def __init__(self, manager, db: DatabaseManager):
         self.manager = manager
         self.expanded = False
 
         self.info = []
 
+        self.db = db
+
         self.food_info_label = pygame_gui.elements.UILabel(
-            text=f"Jedzenie: {utils.FOOD_TO_GIVE}",
+            text=f"Jedzenie: {utils.calculateFoodToGive(self.db)}",
             relative_rect=pygame.Rect((10, 10), (200, 70)),
             manager=manager
         )
 
         self.pet_name_info_label = pygame_gui.elements.UILabel(
-            text=f"{utils.PET_NAME}",
+            text=f"{getPetName(self.db)}",
             relative_rect=pygame.Rect((10, 30), (200, 70)),
             manager=manager
         )
@@ -33,7 +37,7 @@ class SettingsMenu:
             pygame.image.load("assets/gui/cross.png").convert_alpha(), (50, 50))
 
         self.toggle_btn = pygame_gui.elements.UIImage(
-            relative_rect=pygame.Rect((SCREEN_WIDTH - 60, 10), (50, 50)),
+            relative_rect=pygame.Rect((480 - 60, 10), (50, 50)),
             image_surface=self.img_closed,
             manager=manager
         )
@@ -49,7 +53,7 @@ class SettingsMenu:
                 pygame.image.load(path).convert_alpha(), (50, 50))
             btn = pygame_gui.elements.UIImage(
                 relative_rect=pygame.Rect(
-                    (SCREEN_WIDTH - 150 - i * 60, 10), (50, 50)),
+                    (480 - 150 - i * 60, 10), (50, 50)),
                 image_surface=img,
                 manager=manager
             )
@@ -79,10 +83,11 @@ class SettingsMenu:
         self.close() if self.expanded else self.open()
 
     def update_info(self):
-        self.food_info_label.set_text(f"Jedzenie: {utils.FOOD_TO_GIVE}")
-        self.pet_name_info_label.set_text(f"{utils.PET_NAME}")
+        self.food_info_label.set_text(
+            f"Jedzenie: {utils.calculateFoodToGive(self.db)}")
+        self.pet_name_info_label.set_text(f"{getPetName(self.db)}")
 
-        if utils.FOOD_TO_GIVE <= 0:
+        if utils.calculateFoodToGive(self.db) <= 0:
             self.toggle_btn.hide()
         else:
             self.toggle_btn.show()
@@ -91,7 +96,7 @@ class SettingsMenu:
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
 
-            if utils.FOOD_TO_GIVE <= 0:
+            if utils.calculateFoodToGive(self.db) <= 0:
                 return True
 
             if self.toggle_btn.rect.collidepoint(pos):
