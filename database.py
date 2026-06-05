@@ -31,6 +31,9 @@ class DatabaseManager:
         if new_task['family_id'] == FAMILY_ID and new_task['status'] == 'done':
             self.event_queue.put_nowait(new_task)
 
+    def table(self, table_name: str):
+        return self.client.table(table_name)
+
 
 def run_db_loop(db_manager):
     loop = asyncio.new_event_loop()

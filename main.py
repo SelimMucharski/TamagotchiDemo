@@ -18,6 +18,9 @@ manager = manager = pygame_gui.UIManager(
 
 clock = pygame.time.Clock()
 
+utils.db = DatabaseManager(SUPABASE_URL, SUPABASE_KEY)
+threading.Thread(target=run_db_loop, args=(utils.db,), daemon=True).start()
+
 all_sprites = pygame.sprite.Group()
 foods = pygame.sprite.Group()
 pet = Pet(0, 0)
@@ -27,9 +30,6 @@ menu = SettingsMenu(manager)
 background = pygame.transform.scale(pygame.image.load(
     "assets/background/background.png").convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-
-db = DatabaseManager(SUPABASE_URL, SUPABASE_KEY)
-threading.Thread(target=run_db_loop, args=(db,), daemon=True).start()
 
 health_levels = [pygame.transform.scale(pygame.image.load(
     f"assets/health/tile{i:03d}.png").convert_alpha(), (40, 40)) for i in range(6)]
@@ -41,7 +41,7 @@ while run:
     time_delta = clock.tick(8) / 1000.0
 
     try:
-        task = db.event_queue.get_nowait()
+        task = utils.db.event_queue.get_nowait()
         print(f"Zadanie z bazy! {task}")
         utils.FOOD_TO_GIVE += 1
         menu.update_info()

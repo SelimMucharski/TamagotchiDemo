@@ -30,6 +30,8 @@ HEALTH_DECREASE_RATE = 0.001
 
 MOOD_TRESHOLD = 2
 
+db = None
+
 
 def world_to_screen(x, y):
     px = x + WORLD_0X
