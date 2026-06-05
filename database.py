@@ -1,5 +1,6 @@
 import asyncio
 from supabase import create_async_client
+import utils
 
 FAMILY_ID = "acc4e8ca-ab29-4342-83e0-fd82736455ce"
 
@@ -12,6 +13,18 @@ class DatabaseManager:
         self.channel = None
         self.event_queue = asyncio.Queue()
 
+    async def load_info(self):
+        pet = (
+            await self.table("pets")
+            .select("name,energy")
+            .eq("family_id", FAMILY_ID)
+            .single()
+            .execute()
+        )
+
+        utils.PET_NAME = pet.data['name']
+        utils.HEALTH_LEVEL = int(pet.data['energy']) / 100 * utils.MAX_HEALTH
+
     async def start(self):
         self.client = await create_async_client(self.url, self.key)
         self.channel = self.client.channel("tasks-realtime")
@@ -23,6 +36,7 @@ class DatabaseManager:
             callback=self._on_task_done
         )
         await self.channel.subscribe()
+        await self.load_info()
         print("System zadań aktywny.")
 
     def _on_task_done(self, payload):

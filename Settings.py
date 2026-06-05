@@ -80,6 +80,7 @@ class SettingsMenu:
 
     def update_info(self):
         self.food_info_label.set_text(f"Jedzenie: {utils.FOOD_TO_GIVE}")
+        self.pet_name_info_label.set_text(f"{utils.PET_NAME}")
 
         if utils.FOOD_TO_GIVE <= 0:
             self.toggle_btn.hide()

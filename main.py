@@ -71,8 +71,6 @@ while run:
                     utils.ITEM_CHOSEN = None
                     utils.FOOD_TO_GIVE -= 1
 
-                    menu.update_info()
-
         if event.type == pygame.FINGERDOWN:
             if event.x == 0 and event.y == 0:
                 continue
@@ -92,6 +90,8 @@ while run:
             addHeartToPet(all_sprites, pet)
         if event.type == ITEM_ON_GROUND_EVENT:
             pet.go_to(event.pos.x)
+
+    menu.update_info()
 
     manager.update(time_delta)
     pet.update(None)
