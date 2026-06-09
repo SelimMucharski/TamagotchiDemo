@@ -114,6 +114,12 @@ class Pet:
 
         self.waypoints = waypoints_tmp
 
+        pygame.event.post(
+            pygame.Event(
+                utils.UPDATE_PET_EVENT
+            )
+        )
+
         self.state = HappyState()
         self.state.enter(self)
 

@@ -82,7 +82,7 @@ class App:
         self.background = pygame.transform.scale(pygame.image.load(
             "assets/background/background.png").convert(), (utils.SCREEN_WIDTH, utils.SCREEN_HEIGHT))
 
-        pygame.time.set_timer(utils.UPDATE_PET_EVENT, 1000)
+        # pygame.time.set_timer(utils.UPDATE_PET_EVENT, 1000)
 
         while True:
             try:
@@ -127,6 +127,8 @@ class App:
                                              f'assets/food/tile{utils.ITEM_CHOSEN:03d}.png')
                             self.all_sprites.add(food)
                             self.foods.add(food)
+
+                            utils.ITEMS_THROWN += 1
 
                             utils.ITEM_CHOSEN = None
 
