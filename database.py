@@ -1,7 +1,7 @@
 import asyncio
 from supabase import create_async_client
 
-FAMILY_ID = "e7db7b7e-0c56-4c40-90cc-85b58171f25e"
+FAMILY_ID = "69302c27-65fa-4cb9-8f76-59fc0c0ff797"
 
 
 class DatabaseManager:
@@ -54,6 +54,27 @@ class DatabaseManager:
             .execute()
         )
 
+    async def add_points_to_user(self, user_id: str, points_to_add: int):
+        response = await (
+            self.table("users")
+            .select("points")
+            .eq("id", user_id)
+            .single()
+            .execute()
+        )
+        
+
+        current_points = response.data["points"] or 0
+        print(current_points)
+        new_points = current_points + points_to_add
+
+        await (
+            self.table("users")
+            .update({"points": new_points})
+            .eq("id", user_id)
+            .execute()
+        )
+
     def _on_pet_change(self, payload):
         pet = payload["data"].get("record") or payload["data"].get("new")
 
@@ -70,16 +91,19 @@ class DatabaseManager:
     async def load_tasks_cache(self):
         result = (
             await self.table("tasks")
-            .select("id, status, family_id")
+            .select("id, status, family_id, assigned_to_user_id")
             .eq("family_id", FAMILY_ID)
             .in_("status", ["todo", "done", "expired"])
             .execute()
         )
 
+        print(result.data)
+
         self.tasks_cache = {
             task["id"]: {
                 "id": task["id"],
-                "status": task["status"]
+                "status": task["status"],
+                "assigned_to_user_id": task["assigned_to_user_id"]
             }
             for task in result.data
         }
@@ -104,9 +128,12 @@ class DatabaseManager:
             self.tasks_cache.pop(task_id, None)
             return
 
+        userID = task["assigned_to_user_id"]
+
         self.tasks_cache[task_id] = {
             "id": task_id,
-            "status": status
+            "status": status,
+            "assigned_to_user_id": userID
         }
 
         if status == "done":

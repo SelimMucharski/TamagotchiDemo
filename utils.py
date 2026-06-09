@@ -69,11 +69,17 @@ async def decreaseTasks(db):
 
     task_id = done_task["id"]
 
+    print(done_task)
+
     await (
         db.table("tasks")
         .update({"status": "exhausted"})
         .eq("id", task_id)
         .execute()
     )
+
+    userID = done_task["assigned_to_user_id"]
+
+    await db.add_points_to_user(userID, 10)
 
     return True
