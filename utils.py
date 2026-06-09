@@ -80,6 +80,7 @@ async def decreaseTasks(db):
 
     userID = done_task["assigned_to_user_id"]
 
-    await db.add_points_to_user(userID, 10)
+    if userID:
+        await db.add_points_to_user(userID, 10)
 
     return True
