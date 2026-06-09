@@ -129,6 +129,7 @@ class App:
                             self.foods.add(food)
 
                             utils.ITEM_CHOSEN = None
+                            utils.ITEM_BIAS += 1
 
                 if event.type == pygame.FINGERDOWN:
                     if event.x == 0 and event.y == 0:

@@ -62,7 +62,6 @@ class DatabaseManager:
             .single()
             .execute()
         )
-        
 
         current_points = response.data["points"] or 0
         print(current_points)
@@ -126,6 +125,8 @@ class DatabaseManager:
 
         if status not in ("todo", "done", "expired"):
             self.tasks_cache.pop(task_id, None)
+            import utils
+            utils.ITEM_BIAS -= 1
             return
 
         userID = task["assigned_to_user_id"]

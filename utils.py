@@ -11,6 +11,7 @@ ITEM_ON_GROUND_EVENT = 32868
 UPDATE_PET_EVENT = 32870
 
 ITEM_CHOSEN = None
+ITEM_BIAS = 0
 
 MAX_HEALTH = 5
 
@@ -28,7 +29,7 @@ def screen_to_word(px, py):
 
 
 def calculateFoodToGive(db):
-    return len([item for item in db.get_tasks_cached() if item["status"] == "done"])
+    return max(0, len([item for item in db.get_tasks_cached() if item["status"] == "done"]) - ITEM_BIAS)
 
 
 def calculate_energy(db):
