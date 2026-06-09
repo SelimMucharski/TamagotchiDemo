@@ -128,8 +128,6 @@ class App:
                             self.all_sprites.add(food)
                             self.foods.add(food)
 
-                            utils.ITEMS_THROWN += 1
-
                             utils.ITEM_CHOSEN = None
 
                 if event.type == pygame.FINGERDOWN:
