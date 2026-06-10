@@ -124,9 +124,11 @@ class DatabaseManager:
             return
 
         if status not in ("todo", "done", "expired"):
-            self.tasks_cache.pop(task_id, None)
             import utils
-            utils.ITEM_BIAS -= 1
+            if task_id in self.tasks_cache:
+                utils.ITEM_BIAS -= 1
+            
+            self.tasks_cache.pop(task_id, None)
             return
 
         userID = task["assigned_to_user_id"]
